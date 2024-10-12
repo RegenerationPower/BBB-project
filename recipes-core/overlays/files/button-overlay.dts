@@ -1,0 +1,36 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+/ {
+	compatible = "ti,beaglebone", "ti,beaglebone-black";
+	
+	fragment@0 {
+		target = <&am33xx_pinmux>;
+		__overlay__ {
+			button_pins: pinmux_button_pins {
+				 pinctrl-single,pins = <
+                    0x840 0x27
+            		>; 	/* P9_15 (GPIO1_16) as input */
+			};
+		};
+	};	/* fragment@0 */
+	
+	fragment@1 {
+		target = <&ocp>;
+		__overlay__ {
+			button {
+			 	compatible = "gpio-keys";
+                pinctrl-names = "default";
+                pinctrl-0 = <&button_pins>;
+				
+				label = "Button 1";
+				gpios = <&gpio1 16 GPIO_ACTIVE_LOW>;
+				linux,code = <KEY_ENTER>;
+			};
+		};
+	};	/* fragment@1 */
+};	/* root */
+
