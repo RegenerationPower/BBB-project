@@ -94,15 +94,12 @@ static int button_probe(struct platform_device *pdev)
         printk(KERN_ERR "button_driver.c: Failed to get GPIO from DT\n");
         return button_gpio;
     }
-    printk(KERN_INFO "button_driver.c: Successfully got GPIO from DT!\n");
 
-    /* Request GPIO */
     ret = devm_gpio_request_one(&pdev->dev, button_gpio, GPIOF_IN, "button");
     if (ret) {
         printk(KERN_ERR "button_driver.c: Failed to request GPIO\n");
         return ret;
     }
-    printk(KERN_INFO "button_driver.c: Successfully requested GPIO!\n");
 
     /* Retrieve IRQ from device tree */
     button_irq = irq_of_parse_and_map(np, 0);
@@ -110,37 +107,29 @@ static int button_probe(struct platform_device *pdev)
         printk(KERN_ERR "button_driver.c: Failed to get IRQ from DT\n");
         return -EINVAL;
     }
-    printk(KERN_INFO "button_driver.c: Successfully got IRQ from DT!\n");
 
-    /* Request IRQ */
     ret = devm_request_irq(&pdev->dev, button_irq, button_interrupt,
                            IRQF_TRIGGER_FALLING, "button", NULL);
     if (ret) {
         printk(KERN_ERR "button_driver.c: Failed to request IRQ\n");
         return ret;
     }
-    printk(KERN_INFO "button_driver.c: Successfully requested IRQ!\n");
 
-    /* Allocate input device */
     button_dev = devm_input_allocate_device(&pdev->dev);
     if (!button_dev) {
         printk(KERN_ERR "button_driver.c: Not enough memory\n");
         return -ENOMEM;
     }
-    printk(KERN_INFO "button_driver.c: Successfully allocated input device!\n");
 
-    /* Set up input device */
     button_dev->name = "GPIO Button";
     button_dev->evbit[0] = BIT_MASK(EV_KEY);
     button_dev->keybit[BIT_WORD(KEY_ENTER)] = BIT_MASK(KEY_ENTER);
 
-    /* Register input device */
     ret = input_register_device(button_dev);
     if (ret) {
         printk(KERN_ERR "button_driver.c: Failed to register input device\n");
         return ret;
     }
-    printk(KERN_INFO "button_driver.c: Successfully registered input device!\n");
 
     pr_info("Button driver loaded\n");
     return 0;

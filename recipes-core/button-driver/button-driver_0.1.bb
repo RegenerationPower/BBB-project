@@ -18,5 +18,5 @@ do_install() {
     install -m 644 ${S}/button_driver.ko ${D}/lib/modules/${KERNEL_VERSION}/extra/
 }
 
-FILES:${PN} = "/lib/modules/${KERNEL_VERSION}/extra/button_driver.ko"
+#FILES:${PN} = "/lib/modules/${KERNEL_VERSION}/extra/button_driver.ko"
 
