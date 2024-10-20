@@ -3,7 +3,6 @@
 
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
-#include <dt-bindings/interrupt-controller/irq.h>
 
 / {
 	compatible = "ti,beaglebone", "ti,beaglebone-black";
@@ -12,9 +11,7 @@
 	version = "00A1";
 	
 	exclusive-use =
-    /* the pin header uses */
     "P9.15",  /* GPIO1_16 */
-    /* the hardware ip uses */
     "gpio1";
 	
 	fragment@0 {
@@ -36,15 +33,10 @@
                 pinctrl-names = "default";
                 pinctrl-0 = <&button_pins>;
 				
-				button_P9_15 {
-					label = "Button 1";
-					gpios = <&gpio1 16 GPIO_ACTIVE_LOW>;
-					linux,code = <KEY_ENTER>;
-					debounce-interval = <10>;
-					interrupts = <16 IRQ_TYPE_EDGE_FALLING>;
-					gpio-key,wakeup;
-					autorepeat;
-				};
+				label = "Button 1";
+				gpios = <&gpio1 16 GPIO_ACTIVE_LOW>;
+				linux,code = <KEY_ENTER>;
+				debounce-interval = <10>;
 			}; /* button */
 		};
 	};	/* fragment@1 */

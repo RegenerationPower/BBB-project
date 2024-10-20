@@ -8,6 +8,7 @@
 #include <linux/of_irq.h>
 #include <linux/platform_device.h>
 
+
 static struct input_dev *button_dev;
 static int button_gpio;
 static int button_irq;
@@ -19,68 +20,6 @@ static irqreturn_t button_interrupt(int irq, void *dev_id)
     printk(KERN_INFO "button_driver.c: Button pressed!\n");
     return IRQ_HANDLED;
 }
-
-/*Module's init entry point */
-/*static int __init button_driver_init(void)
-{
-	int ret;
-	
-    if (!gpio_is_valid(BUTTON_GPIO_PIN)) {
-        printk(KERN_ERR "button_driver.c: Invalid GPIO pin\n");  
-        return -ENODEV;
-    }
-    
-    if(gpio_direction_input(BUTTON_GPIO_PIN))
-    {
-    	printk(KERN_ERR "button_driver.c: Cannot change GPIO direction %d\n", BUTTON_GPIO_PIN);
-    	return -EBUSY;
-    }
-	
-    if (request_irq(BUTTON_IRQ, button_interrupt, IRQF_TRIGGER_RISING, "button", NULL)) 
-    {
-		printk(KERN_ERR "button_driver.c: Can't allocate irq %d\n", BUTTON_IRQ);
-        ret = -EBUSY;
-        goto err_free_gpio;
-    }
-	
-    button_dev = input_allocate_device();
-    if (!button_dev) 
-    {
-        printk(KERN_ERR "button_driver.c: Not enough memory\n");
-        ret = -ENOMEM;
-        goto err_free_irq;
-    }
-    
-    button_dev->name = "GPIO Button";
-    button_dev->evbit[0] = BIT_MASK(EV_KEY);
-    button_dev->keybit[BIT_WORD(KEY_ENTER)] = BIT_MASK(KEY_ENTER);
-    
-    ret = input_register_device(button_dev);
-    if (ret) {
-        printk(KERN_ERR "button_driver.c: Failed to register input device\n");
-        goto err_free_dev;
-    }
-	
-	pr_info("Button driver loaded\n");
-	return 0;
-
-err_free_dev:
-	input_free_device(button_dev);
-err_free_irq:
-	free_irq(BUTTON_IRQ, button_interrupt);
-err_free_gpio:
-	gpio_free(BUTTON_GPIO_PIN);
-	return ret;
-}*/
-
-/*Module's exit entry point */
-/*static void __exit button_driver_exit(void)
-{
-    input_unregister_device(button_dev);
-    free_irq(BUTTON_IRQ, button_interrupt);
-    gpio_free(BUTTON_GPIO_PIN);
-	pr_info("Button driver unloaded\n");		
-}*/
 
 /* Probe function */
 static int button_probe(struct platform_device *pdev)
@@ -104,13 +43,15 @@ static int button_probe(struct platform_device *pdev)
     }
     printk(KERN_INFO "button_driver.c: Successfully requested GPIO!\n");
 
-    /* Retrieve IRQ from device tree */
-    button_irq = irq_of_parse_and_map(np, 0);
+     /* Retrieve IRQ for GPIO */
+    button_irq = gpiod_to_irq(gpio_to_desc(button_gpio));
     if (!button_irq) {
-        printk(KERN_ERR "button_driver.c: Failed to get IRQ from DT\n");
+        printk(KERN_ERR "button_driver.c: Failed to get IRQ fot GPIO\n");
         return -EINVAL;
     }
-    printk(KERN_INFO "button_driver.c: Successfully got IRQ from DT!\n");
+    printk(KERN_INFO "button_driver.c: Successfully got IRQ for GPIO!\n");
+    
+ 	printk(KERN_INFO "Button GPIO: %d, IRQ: %d\n", button_gpio, button_irq);
 
     /* Request IRQ */
     ret = devm_request_irq(&pdev->dev, button_irq, button_interrupt,
@@ -187,5 +128,5 @@ module_exit(button_driver_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Dmytro Voznytsia");
-MODULE_DESCRIPTION("Simple input device - GPIO Button Driver");
+MODULE_DESCRIPTION("Simple device driver - GPIO Button Driver");
 
