@@ -7,12 +7,19 @@
 / {
 	compatible = "ti,beaglebone", "ti,beaglebone-black";
 	
+	part-number = "BBB-BUTTON1";
+	version = "00A1";
+	
+	exclusive-use =
+    "P9.15",  /* GPIO1_16 */
+    "gpio1";
+	
 	fragment@0 {
 		target = <&am33xx_pinmux>;
 		__overlay__ {
 			button_pins: pinmux_button_pins {
 				 pinctrl-single,pins = <
-                    0x840 0x27
+                    0x040 0x27
             		>; 	/* P9_15 (GPIO1_16) as input */
 			};
 		};
@@ -29,7 +36,8 @@
 				label = "Button 1";
 				gpios = <&gpio1 16 GPIO_ACTIVE_LOW>;
 				linux,code = <KEY_ENTER>;
-			};
+				debounce-interval = <50>;
+			}; /* button */
 		};
 	};	/* fragment@1 */
 };	/* root */
