@@ -83,13 +83,13 @@ fragment@1 {
     target = <&ocp>;
     __overlay__ {
         button {
-		 	compatible = "gpio-keys";
+	    compatible = "gpio-keys";
             pinctrl-names = "default";
             pinctrl-0 = <&button_pins>;
-			label = "Button 1";
-			gpios = <&gpio1 16 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_ENTER>;
-			debounce-interval = <50>;
+	    label = "Button 1";
+	    gpios = <&gpio1 16 GPIO_ACTIVE_LOW>;
+	    linux,code = <KEY_ENTER>;
+	    debounce-interval = <50>;
         };
     };
 };
